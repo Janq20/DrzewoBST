@@ -17,7 +17,15 @@ private:
     // Prywatna, rekurencyjna metoda pomocnicza do dodawania
     Wezel* dodaj(Wezel* wezel, int wartosc);
 
+    // --- NOWE METODY PRYWATNE DLA COMMIT 3 ---
+    void preorder(Wezel* wezel);
+    void inorder(Wezel* wezel);
+    void postorder(Wezel* wezel);
+
 public:
-    DrzewoBST(); 
-    void dodaj(int wartosc); 
+    DrzewoBST();
+    void dodaj(int wartosc);
+
+    // --- NOWA METODA PUBLICZNA DLA COMMIT 3 ---
+    void wyswietlGraficznie(int tryb); // tryb: 1-pre, 2-in, 3-post
 };

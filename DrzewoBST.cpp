@@ -1,28 +1,52 @@
-#include "DrzewoBST.h"
+// --- Metody Wyświetlania (Prywatne) ---
 
-// --- Konstruktor ---
-DrzewoBST::DrzewoBST() {
-    korzen = nullptr; 
+void DrzewoBST::preorder(Wezel* wezel) {
+    if (wezel != nullptr) {
+        cout << wezel->dane << " ";
+        preorder(wezel->lewy);
+        preorder(wezel->prawy);
+    }
 }
 
-// --- Metody publiczne ---
-
-void DrzewoBST::dodaj(int wartosc) {
-    korzen = dodaj(korzen, wartosc);
+void DrzewoBST::inorder(Wezel* wezel) {
+    if (wezel != nullptr) {
+        inorder(wezel->lewy);
+        cout << wezel->dane << " ";
+        inorder(wezel->prawy);
+    }
 }
 
-// --- Metody prywatne ---
+void DrzewoBST::postorder(Wezel* wezel) {
+    if (wezel != nullptr) {
+        postorder(wezel->lewy);
+        postorder(wezel->prawy);
+        cout << wezel->dane << " ";
+    }
+}
 
-Wezel* DrzewoBST::dodaj(Wezel* wezel, int wartosc) {
-    if (wezel == nullptr) {
-        return new Wezel(wartosc);
+// --- Metoda Wyświetlania (Publiczna) ---
+
+void DrzewoBST::wyswietlGraficznie(int tryb) {
+    if (korzen == nullptr) {
+        cout << "Drzewo jest puste." << endl;
+        return;
     }
-    if (wartosc < wezel->dane) {
-        wezel->lewy = dodaj(wezel->lewy, wartosc);
+
+    switch (tryb) {
+        case 1:
+            cout << "Pre-order: ";
+            preorder(korzen);
+            break;
+        case 2:
+            cout << "In-order (posortowane): ";
+            inorder(korzen);
+            break;
+        case 3:
+            cout << "Post-order: ";
+            postorder(korzen);
+            break;
+        default:
+            cout << "Nieznany tryb wyświetlania." << endl;
     }
-    else if (wartosc > wezel->dane) {
-        wezel->prawy = dodaj(wezel->prawy, wartosc);
-    }
- 
-    return wezel;
+    cout << endl; 
 }
