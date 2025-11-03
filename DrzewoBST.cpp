@@ -109,4 +109,78 @@ void DrzewoBST::znajdzSciezke(int dane) {
     }
 }
 
-// Dodana kolejna kluczowa funkcja drzeww
+// Dodana kolejna kluczowa funkcja drzewa
+
+Wezel* DrzewoBST::znajdzMin(Wezel* wezel) {
+    if (wezel == nullptr) {
+        return nullptr;
+    }
+    // Najmniejszy element jest w najbardziej lewym węźle
+    Wezel* aktualny = wezel;
+    while (aktualny->lewy != nullptr) {
+        aktualny = aktualny->lewy;
+    }
+    return aktualny;
+}
+
+Wezel* DrzewoBST::usun(Wezel* wezel, int wartosc) {
+    // 1. Warunek bazowy: Wartość nie została znaleziona
+    if (wezel == nullptr) {
+        return nullptr;
+    }
+
+    // Rekurencyjne poszukiwanie węzła do usunięcia
+    if (wartosc < wezel->dane) {
+        // Idź w lewo
+        wezel->lewy = usun(wezel->lewy, wartosc);
+    } else if (wartosc > wezel->dane) {
+        // Idź w prawo
+        wezel->prawy = usun(wezel->prawy, wartosc);
+    } else {
+        // *** Węzeł do usunięcia został znaleziony (wezel->dane == wartosc) ***
+
+        // --- Przypadek 1: Brak dzieci LUB tylko jedno dziecko ---
+        if (wezel->lewy == nullptr) {
+            Wezel* temp = wezel->prawy;
+            delete wezel;
+            return temp; // Zwróć prawe dziecko (może być nullptr)
+        } else if (wezel->prawy == nullptr) {
+            Wezel* temp = wezel->lewy;
+            delete wezel;
+            return temp; // Zwróć lewe dziecko
+        }
+
+        // --- Przypadek 3: Dwoje dzieci ---
+        
+        // a) Znajdź następnika (najmniejszy element w prawym poddrzewie)
+        Wezel* nastepnik = znajdzMin(wezel->prawy);
+        
+        // b) Skopiuj dane następnika do bieżącego węzła
+        wezel->dane = nastepnik->dane;
+        
+        // c) Usuń faktyczny następnik (który ma teraz maksymalnie jedno dziecko, 
+        // co jest obsługiwane przez rekurencyjne wywołanie 'usun')
+        wezel->prawy = usun(wezel->prawy, nastepnik->dane);
+    }
+    
+    return wezel; // Zwróć niezmieniony wskaźnik, jeśli nic nie usuwaliśmy
+}
+
+void DrzewoBST::usun(int wartosc) {
+    // Wywołaj prywatną funkcję usuwania, aktualizując wskaźnik korzenia drzewa
+    Wezel* nowy_korzen = usun(korzen, wartosc);
+    
+    if (nowy_korzen != korzen) {
+        korzen = nowy_korzen;
+        cout << "\n✅ Wartość " << wartosc << " usunięta pomyślnie." << endl;
+    } else if (nowy_korzen == nullptr && korzen == nullptr) {
+        // Specjalny przypadek: Usunięto ostatni węzeł (korzeń)
+        cout << "\n✅ Wartość " << wartosc << " usunięta pomyślnie. Drzewo jest teraz puste." << endl;
+    } else {
+        // Wartość nie została znaleziona lub węzeł był liściem i korzeń się nie zmienił
+        // (Węzły liści i węzły z jednym dzieckiem zmieniają wskaźniki wewnątrz drzewa, 
+        // ale nie korzeń, chyba że korzeń jest usuwany)
+        // Możemy tu dodać dodatkowe sprawdzenie, czy wartość istniała.
+        cout << "\n❌ Nie znaleziono wartości " << wartosc << " do usunięcia." << endl;
+    }
+}

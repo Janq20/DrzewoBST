@@ -21,11 +21,13 @@ private:
     void preorder(Wezel* wezel);
     void inorder(Wezel* wezel);
     void postorder(Wezel* wezel);
+    Wezel* usun(Wezel* wezel, int wartosc);
+    Wezel* znajdzMin(Wezel* wezel);.
 
 public:
     DrzewoBST();
     void dodaj(int wartosc);
-
+    void usun (int wartosc);
     // --- NOWA METODA PUBLICZNA DLA COMMIT 3 ---
     void wyswietlGraficznie(int tryb); // tryb: 1-pre, 2-in, 3-post
 };
