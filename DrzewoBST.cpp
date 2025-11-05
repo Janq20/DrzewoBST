@@ -1,4 +1,28 @@
-// --- Metody Wyświetlania (Prywatne) ---
+#include "DrzewoBST.h"
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+DrzewoBST::DrzewoBST() {
+    korzen = nullptr;
+}
+
+Wezel* DrzewoBST::dodaj(Wezel* wezel, int wartosc) {
+    if (wezel == nullptr) {
+        return new Wezel(wartosc);
+    }
+    if (wartosc < wezel->dane) {
+        wezel->lewy = dodaj(wezel->lewy, wartosc);
+    } else if (wartosc > wezel->dane) {
+        wezel->prawy = dodaj(wezel->prawy, wartosc);
+    }
+    return wezel;
+}
+
+void DrzewoBST::dodaj(int wartosc) {
+    korzen = dodaj(korzen, wartosc);
+}
 
 void DrzewoBST::preorder(Wezel* wezel) {
     if (wezel != nullptr) {
@@ -23,8 +47,6 @@ void DrzewoBST::postorder(Wezel* wezel) {
         cout << wezel->dane << " ";
     }
 }
-
-// --- Metoda Wyświetlania (Publiczna) ---
 
 void DrzewoBST::wyswietlGraficznie(int tryb) {
     if (korzen == nullptr) {
@@ -61,33 +83,24 @@ bool DrzewoBST::znajdzSciezke(Wezel* wezel, int dane, string& sciezka) {
     if (wezel->dane == dane) {
         return true;
     }
-
     
     sciezka += " -> ";
-
-   
+    
     bool znaleziono;
     
     if (dane < wezel->dane) {
-       
         znaleziono = znajdzSciezke(wezel->lewy, dane, sciezka);
     } else {
-   
         znaleziono = znajdzSciezke(wezel->prawy, dane, sciezka);
     }
 
- 
     if (!znaleziono) {
-       
         string usunieta_wartosc = to_string(wezel->dane);
         size_t dlugoscDoUsuniecia = usunieta_wartosc.length() + 4; 
 
-        
         if (sciezka.length() >= dlugoscDoUsuniecia && sciezka.substr(sciezka.length() - 4) == " -> ") {
-            
              sciezka.erase(sciezka.length() - dlugoscDoUsuniecia);
         } else if (sciezka.length() >= usunieta_wartosc.length()) {
-             
              sciezka.erase(sciezka.length() - usunieta_wartosc.length());
         }
     }
@@ -98,21 +111,18 @@ bool DrzewoBST::znajdzSciezke(Wezel* wezel, int dane, string& sciezka) {
 void DrzewoBST::znajdzSciezke(int dane) {
     string sciezka = "";
 
-   
     if (znajdzSciezke(korzen, dane, sciezka)) {
-        cout << "\n✅ Ścieżka do danych " << dane << ": " << sciezka << endl;
+        cout << "\nŚcieżka do danych " << dane << ": " << sciezka << endl;
     } else {
-        cout << "\n❌ Dane " << dane << " nie zostały znalezione w drzewie." << endl;
+        cout << "\nDane " << dane << " nie zostały znalezione w drzewie." << endl;
     }
 }
-
-
 
 Wezel* DrzewoBST::znajdzMin(Wezel* wezel) {
     if (wezel == nullptr) {
         return nullptr;
     }
-   
+    
     Wezel* aktualny = wezel;
     while (aktualny->lewy != nullptr) {
         aktualny = aktualny->lewy;
@@ -121,22 +131,15 @@ Wezel* DrzewoBST::znajdzMin(Wezel* wezel) {
 }
 
 Wezel* DrzewoBST::usun(Wezel* wezel, int wartosc) {
-   
     if (wezel == nullptr) {
         return nullptr;
     }
 
-  
     if (wartosc < wezel->dane) {
-      
         wezel->lewy = usun(wezel->lewy, wartosc);
     } else if (wartosc > wezel->dane) {
-     
         wezel->prawy = usun(wezel->prawy, wartosc);
     } else {
-       
-
-   
         if (wezel->lewy == nullptr) {
             Wezel* temp = wezel->prawy;
             delete wezel;
@@ -147,14 +150,8 @@ Wezel* DrzewoBST::usun(Wezel* wezel, int wartosc) {
             return temp;
         }
 
-    -
-        
         Wezel* nastepnik = znajdzMin(wezel->prawy);
-        
-       
         wezel->dane = nastepnik->dane;
-        
-      
         wezel->prawy = usun(wezel->prawy, nastepnik->dane);
     }
     
@@ -162,16 +159,37 @@ Wezel* DrzewoBST::usun(Wezel* wezel, int wartosc) {
 }
 
 void DrzewoBST::usun(int wartosc) {
-   
-    Wezel* nowy_korzen = usun(korzen, wartosc);
-    
-    if (nowy_korzen != korzen) {
-        korzen = nowy_korzen;
-        cout << "\n✅ Wartość " << wartosc << " usunięta pomyślnie." << endl;
-    } else if (nowy_korzen == nullptr && korzen == nullptr) {
-      
-        cout << "\n✅ Wartość " << wartosc << " usunięta pomyślnie. Drzewo jest teraz puste." << endl;
+    Wezel* stary_korzen = korzen;
+    korzen = usun(korzen, wartosc);
+
+    if (stary_korzen == nullptr) {
+         cout << "\nNie znaleziono wartości " << wartosc << " do usunięcia (drzewo puste)." << endl;
+    } else if (korzen == nullptr && stary_korzen != nullptr) {
+         cout << "\nWartość " << wartosc << " usunięta pomyślnie. Drzewo jest teraz puste." << endl;
     } else {
-        cout << "\n Nie znaleziono wartości " << wartosc << " do usunięcia." << endl;
+         cout << "\nOperacja usuwania dla " << wartosc << " zakończona." << endl;
     }
+}
+
+void DrzewoBST::zapiszDoTekstu(Wezel* wezel, fstream& plik) {
+    if (wezel != nullptr) {
+        plik << wezel->dane << "\n";
+        zapiszDoTekstu(wezel->lewy, plik);
+        zapiszDoTekstu(wezel->prawy, plik);
+    }
+}
+
+void DrzewoBST::zapiszDoTekstu(const string& nazwaPliku) {
+    fstream plik;
+    plik.open(nazwaPliku, ios::out); 
+    
+    if (!plik.is_open()) {
+        cout << "Błąd otwarcia pliku do zapisu: " << nazwaPliku << endl;
+        return;
+    }
+
+    cout << "Rozpoczynam zapis do pliku: " << nazwaPliku << "..." << endl;
+    zapiszDoTekstu(korzen, plik);
+    plik.close();
+    cout << "Drzewo zapisane (tekstowo) do pliku: " << nazwaPliku << endl;
 }
