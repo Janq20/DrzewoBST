@@ -1,4 +1,4 @@
-// --- Metody Wyświetlania (Prywatne) ---
+//-- Metody Wyświetlania (Prywatne)
 
 void DrzewoBST::preorder(Wezel* wezel) {
     if (wezel != nullptr) {
@@ -24,7 +24,7 @@ void DrzewoBST::postorder(Wezel* wezel) {
     }
 }
 
-// --- Metoda Wyświetlania (Publiczna) ---
+//-- Metoda Wyświetlania (Publiczna)
 
 void DrzewoBST::wyswietlGraficznie(int tryb) {
     if (korzen == nullptr) {
@@ -49,4 +49,132 @@ void DrzewoBST::wyswietlGraficznie(int tryb) {
             cout << "Nieznany tryb wyświetlania." << endl;
     }
     cout << endl; 
+}
+
+//-- Metody Wyszukiwania
+
+bool DrzewoBST::znajdzSciezke(Wezel* wezel, int dane, string& sciezka) {
+    if (wezel == nullptr) {
+        return false;
+    }
+
+    sciezka += to_string(wezel->dane);
+
+    if (wezel->dane == dane) {
+        return true;
+    }
+
+    sciezka += " -> ";
+
+    bool znaleziono;
+    
+    if (dane < wezel->dane) {
+        znaleziono = znajdzSciezke(wezel->lewy, dane, sciezka);
+    } else {
+        znaleziono = znajdzSciezke(wezel->prawy, dane, sciezka);
+    }
+
+    if (!znaleziono) {
+        string usunieta_wartosc = to_string(wezel->dane);
+        size_t dlugoscDoUsuniecia = usunieta_wartosc.length() + 4; 
+
+        if (sciezka.length() >= dlugoscDoUsuniecia && sciezka.substr(sciezka.length() - 4) == " -> ") {
+             sciezka.erase(sciezka.length() - dlugoscDoUsuniecia);
+        } else if (sciezka.length() >= usunieta_wartosc.length()) {
+             sciezka.erase(sciezka.length() - usunieta_wartosc.length());
+        }
+    }
+
+    return znaleziono;
+}
+
+void DrzewoBST::znajdzSciezke(int dane) {
+    string sciezka = "";
+
+    if (znajdzSciezke(korzen, dane, sciezka)) {
+        cout << "\nŚcieżka do danych " << dane << ": " << sciezka << endl;
+    } else {
+        cout << "\nDane " << dane << " nie zostały znalezione w drzewie." << endl;
+    }
+}
+
+//-- Metody Usuwania
+
+Wezel* DrzewoBST::znajdzMin(Wezel* wezel) {
+    if (wezel == nullptr) {
+        return nullptr;
+    }
+    Wezel* aktualny = wezel;
+    while (aktualny->lewy != nullptr) {
+        aktualny = aktualny->lewy;
+    }
+    return aktualny;
+}
+
+Wezel* DrzewoBST::usun(Wezel* wezel, int wartosc) {
+    if (wezel == nullptr) {
+        return nullptr;
+    }
+
+    if (wartosc < wezel->dane) {
+        wezel->lewy = usun(wezel->lewy, wartosc);
+    } else if (wartosc > wezel->dane) {
+        wezel->prawy = usun(wezel->prawy, wartosc);
+    } else {
+
+        if (wezel->lewy == nullptr) {
+            Wezel* temp = wezel->prawy;
+            delete wezel;
+            return temp; 
+        } else if (wezel->prawy == nullptr) {
+            Wezel* temp = wezel->lewy;
+            delete wezel;
+            return temp; 
+        }
+
+        Wezel* nastepnik = znajdzMin(wezel->prawy);
+        
+        wezel->dane = nastepnik->dane;
+        
+        wezel->prawy = usun(wezel->prawy, nastepnik->dane);
+    }
+    
+    return wezel; 
+}
+
+void DrzewoBST::usun(int wartosc) {
+    Wezel* nowy_korzen = usun(korzen, wartosc);
+    
+    if (nowy_korzen != korzen) {
+        korzen = nowy_korzen;
+        cout << "\nWartość " << wartosc << " usunięta pomyślnie." << endl;
+    } else if (nowy_korzen == nullptr && korzen == nullptr) {
+        korzen = nowy_korzen; 
+        cout << "\nWartość " << wartosc << " usunięta pomyślnie. Drzewo jest teraz puste." << endl;
+    } else if (nowy_korzen == korzen) {
+        cout << "\nNie znaleziono wartości " << wartosc << " do usunięcia lub wartość była już w drzewie." << endl;
+    }
+}
+
+void DrzewoBST::zapiszDoTekstu(Wezel* wezel, fstream& plik) {
+    if (wezel != nullptr) {
+        plik << wezel->dane << "\n";
+        zapiszDoTekstu(wezel->lewy, plik);
+        zapiszDoTekstu(wezel->prawy, plik);
+    }
+}
+void DrzewoBST::zapiszDoTekstu(const string& nazwaPliku) {
+    fstream plik;
+    plik.open(nazwaPliku, ios::out); 
+    
+    if (!plik.is_open()) {
+        cout << "Błąd otwarcia pliku do zapisu: " << nazwaPliku << endl;
+        return;
+    }
+    cout << "Rozpoczynam zapis do pliku: " << nazwaPliku << "..." << endl;
+
+    zapiszDoTekstu(korzen, plik);
+
+    plik.close();
+    cout << "Drzewo zapisane (tekstowo) do pliku: " << nazwaPliku << endl;
 }
