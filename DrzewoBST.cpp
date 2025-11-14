@@ -8,6 +8,10 @@ DrzewoBST::DrzewoBST() {
     korzen = nullptr;
 }
 
+DrzewoBST::~DrzewoBST() {
+    usunWszystko();
+}
+
 Wezel* DrzewoBST::dodaj(Wezel* wezel, int wartosc) {
     if (wezel == nullptr) {
         return new Wezel(wartosc);
@@ -165,7 +169,7 @@ void DrzewoBST::usun(int wartosc) {
     if (stary_korzen == nullptr) {
          cout << "\nNie znaleziono wartości " << wartosc << " do usunięcia (drzewo puste)." << endl;
     } else if (korzen == nullptr && stary_korzen != nullptr) {
-         cout << "\nWartość " << wartosc << " usunięta pomyślnie. Drzewo jest teraz puste." << endl;
+         cout << "\nWartość " << wartosc << " usunięta pomyśllnie. Drzewo jest teraz puste." << endl;
     } else {
          cout << "\nOperacja usuwania dla " << wartosc << " zakończona." << endl;
     }
@@ -192,4 +196,17 @@ void DrzewoBST::zapiszDoTekstu(const string& nazwaPliku) {
     zapiszDoTekstu(korzen, plik);
     plik.close();
     cout << "Drzewo zapisane (tekstowo) do pliku: " << nazwaPliku << endl;
+}
+
+void DrzewoBST::usunWszystko() {
+    usunWszystko(korzen); 
+    korzen = nullptr;     
+}
+
+void DrzewoBST::usunWszystko(Wezel* wezel) {
+    if (wezel != nullptr) {
+        usunWszystko(wezel->lewy);
+        usunWszystko(wezel->prawy);
+        delete wezel;
+    }
 }

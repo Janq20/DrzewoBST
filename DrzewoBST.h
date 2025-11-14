@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include <fstream> // Potrzebne do zapisu do pliku
+#include <fstream>
 
 using namespace std;
 
@@ -31,19 +31,20 @@ class DrzewoBST {
 private:
     Wezel* korzen; ///< Wskaźnik na korzeń drzewa.
 
-    // --- Funkcje z poprzednich commitów ---
     Wezel* dodaj(Wezel* wezel, int wartosc);
     void preorder(Wezel* wezel);
     void inorder(Wezel* wezel);
     void postorder(Wezel* wezel);
-
-    // --- Funkcje Pawła (z serwera) ---
     bool znajdzSciezke(Wezel* wezel, int dane, string& sciezka);
     Wezel* znajdzMin(Wezel* wezel);
     Wezel* usun(Wezel* wezel, int wartosc);
-
-    // --- Twoja funkcja (Commit 6) ---
     void zapiszDoTekstu(Wezel* wezel, fstream& plik);
+
+    /**
+     * @brief Prywatna, rekurencyjna funkcja pomocnicza do usuwania wszystkich węzłów.
+     * @param wezel Aktualnie przetwarzany węzeł.
+     */
+    void usunWszystko(Wezel* wezel);
 
 
 public:
@@ -52,16 +53,22 @@ public:
      */
     DrzewoBST();
 
-    // --- Funkcje z poprzednich commitów ---
+    /**
+     * @brief Destruktor.
+     * @details Automatycznie wywołuje usunWszystko(), aby zwolnić pamięć.
+     */
+    ~DrzewoBST();
+
     void dodaj(int wartosc);
     void wyswietlGraficznie(int tryb);
-
-    // --- Funkcje Pawła (z serwera) ---
     void znajdzSciezke(int dane);
     void usun (int wartosc);
-
-    // --- Twoja funkcja (Commit 6) ---
     void zapiszDoTekstu(const string& nazwaPliku);
+
+    /**
+     * @brief Publiczna funkcja do usunięcia wszystkich elementów z drzewa.
+     */
+    void usunWszystko();
 
     /**
      * @brief Deklaracja przyjaźni z klasą MenedzerPlikow.
