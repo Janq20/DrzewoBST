@@ -3,7 +3,6 @@
 #include <limits> 
 #include "DrzewoBST.h"
 #include "Pliki.h"
-
 using namespace std;
 
 /**
@@ -15,9 +14,17 @@ void wyswietlMenu() {
     cout << "2. Usun element\n";
     cout << "3. Znajdz sciezke\n";
     cout << "4. Wyswietl drzewo (tryby)\n";
+<<<<<<< HEAD
     cout << "5. (Opcja niedostepna)\n"; 
     cout << "6. Zapisz do pliku TXT\n";
     cout << "7. Wczytaj z pliku TXT\n";
+=======
+    cout << "5. Usun cale drzewo\n"; 
+    cout << "6. Zapisz do pliku TXT\n";
+    cout << "7. Wczytaj z pliku TXT\n";
+    cout << "8. Zapisz binarnie (BIN)\n";
+    cout << "9. Wczytaj binarnie (BIN)\n";
+>>>>>>> 20bfa62 (Integracja operacji binarnych i czyszczenia drzewa z menu)
     cout << "0. Wyjscie\n";
     cout << "Wybierz opcje: ";
 }
@@ -81,7 +88,16 @@ int main() {
                 drzewo.wyswietlGraficznie(wartosc);
                 break;
 
+<<<<<<< HEAD
             case 6: // Zapis TXT
+=======
+            case 5: // Usuń całe drzewo
+                drzewo.usunWszystko();
+                cout << "Cale drzewo zostalo usuniete." << endl;
+                break;
+
+            case 6: // Zapisz TXT
+>>>>>>> 20bfa62 (Integracja operacji binarnych i czyszczenia drzewa z menu)
                 cout << "Podaj nazwe pliku do zapisu (np. drzewo.txt): ";
                 getline(cin, nazwaPliku);
                 drzewo.zapiszDoTekstu(nazwaPliku);
@@ -93,6 +109,21 @@ int main() {
                 menedzer.wczytajZTekstu(nazwaPliku, drzewo);
                 break;
 
+<<<<<<< HEAD
+=======
+            case 8: // Zapisz Binarnie
+                cout << "Podaj nazwe pliku do zapisu binarnego (np. drzewo.bin): ";
+                getline(cin, nazwaPliku);
+                menedzer.zapiszBinarnie(nazwaPliku, drzewo);
+                break;
+
+            case 9: // Wczytaj Binarnie
+                cout << "Podaj nazwe pliku do wczytania binarnego (np. drzewo.bin): ";
+                getline(cin, nazwaPliku);
+                menedzer.wczytajBinarnie(nazwaPliku, drzewo);
+                break;
+
+>>>>>>> 20bfa62 (Integracja operacji binarnych i czyszczenia drzewa z menu)
             case 0: // Wyjście
                 cout << "Koniec programu." << endl;
                 return 0;
