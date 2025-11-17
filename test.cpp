@@ -28,6 +28,7 @@ private:
     Wezel* usun(Wezel* wezel, int wartosc);
     void zapiszDoTekstu(Wezel* wezel, fstream& plik);
     void usunWszystko(Wezel* wezel);
+    void zapiszGraficznie(Wezel* wezel, fstream& plik, int poziom, int odstep);
 
 public:
     DrzewoBST();
@@ -36,9 +37,10 @@ public:
     void dodaj(int wartosc);
     void wyswietlGraficznie(int tryb);
     void znajdzSciezke(int dane);
-    void usun (int wartosc);
+    void usun(int wartosc);
     void zapiszDoTekstu(const string& nazwaPliku);
     void usunWszystko();
+    void zapiszGraficznieDoTekstu(const string& nazwaPliku);
 
     friend class MenedzerPlikow;
 };
@@ -68,7 +70,8 @@ Wezel* DrzewoBST::dodaj(Wezel* wezel, int wartosc) {
     }
     if (wartosc < wezel->dane) {
         wezel->lewy = dodaj(wezel->lewy, wartosc);
-    } else if (wartosc > wezel->dane) {
+    }
+    else if (wartosc > wezel->dane) {
         wezel->prawy = dodaj(wezel->prawy, wartosc);
     }
     return wezel;
@@ -109,22 +112,22 @@ void DrzewoBST::wyswietlGraficznie(int tryb) {
     }
 
     switch (tryb) {
-        case 1:
-            cout << "Pre-order: ";
-            preorder(korzen);
-            break;
-        case 2:
-            cout << "In-order (posortowane): ";
-            inorder(korzen);
-            break;
-        case 3:
-            cout << "Post-order: ";
-            postorder(korzen);
-            break;
-        default:
-            cout << "Nieznany tryb wyświetlania." << endl;
+    case 1:
+        cout << "Pre-order: ";
+        preorder(korzen);
+        break;
+    case 2:
+        cout << "In-order (posortowane): ";
+        inorder(korzen);
+        break;
+    case 3:
+        cout << "Post-order: ";
+        postorder(korzen);
+        break;
+    default:
+        cout << "Nieznany tryb wyświetlania." << endl;
     }
-    cout << endl; 
+    cout << endl;
 }
 
 bool DrzewoBST::znajdzSciezke(Wezel* wezel, int dane, string& sciezka) {
@@ -137,25 +140,27 @@ bool DrzewoBST::znajdzSciezke(Wezel* wezel, int dane, string& sciezka) {
     if (wezel->dane == dane) {
         return true;
     }
-    
+
     sciezka += " -> ";
-    
+
     bool znaleziono;
-    
+
     if (dane < wezel->dane) {
         znaleziono = znajdzSciezke(wezel->lewy, dane, sciezka);
-    } else {
+    }
+    else {
         znaleziono = znajdzSciezke(wezel->prawy, dane, sciezka);
     }
 
     if (!znaleziono) {
         string usunieta_wartosc = to_string(wezel->dane);
-        size_t dlugoscDoUsuniecia = usunieta_wartosc.length() + 4; 
+        size_t dlugoscDoUsuniecia = usunieta_wartosc.length() + 4;
 
         if (sciezka.length() >= dlugoscDoUsuniecia && sciezka.substr(sciezka.length() - 4) == " -> ") {
-             sciezka.erase(sciezka.length() - dlugoscDoUsuniecia);
-        } else if (sciezka.length() >= usunieta_wartosc.length()) {
-             sciezka.erase(sciezka.length() - usunieta_wartosc.length());
+            sciezka.erase(sciezka.length() - dlugoscDoUsuniecia);
+        }
+        else if (sciezka.length() >= usunieta_wartosc.length()) {
+            sciezka.erase(sciezka.length() - usunieta_wartosc.length());
         }
     }
 
@@ -167,7 +172,8 @@ void DrzewoBST::znajdzSciezke(int dane) {
 
     if (znajdzSciezke(korzen, dane, sciezka)) {
         cout << "\nŚcieżka do danych " << dane << ": " << sciezka << endl;
-    } else {
+    }
+    else {
         cout << "\nDane " << dane << " nie zostały znalezione w drzewie." << endl;
     }
 }
@@ -176,7 +182,7 @@ Wezel* DrzewoBST::znajdzMin(Wezel* wezel) {
     if (wezel == nullptr) {
         return nullptr;
     }
-    
+
     Wezel* aktualny = wezel;
     while (aktualny->lewy != nullptr) {
         aktualny = aktualny->lewy;
@@ -191,14 +197,17 @@ Wezel* DrzewoBST::usun(Wezel* wezel, int wartosc) {
 
     if (wartosc < wezel->dane) {
         wezel->lewy = usun(wezel->lewy, wartosc);
-    } else if (wartosc > wezel->dane) {
+    }
+    else if (wartosc > wezel->dane) {
         wezel->prawy = usun(wezel->prawy, wartosc);
-    } else {
+    }
+    else {
         if (wezel->lewy == nullptr) {
             Wezel* temp = wezel->prawy;
             delete wezel;
             return temp;
-        } else if (wezel->prawy == nullptr) {
+        }
+        else if (wezel->prawy == nullptr) {
             Wezel* temp = wezel->lewy;
             delete wezel;
             return temp;
@@ -208,8 +217,8 @@ Wezel* DrzewoBST::usun(Wezel* wezel, int wartosc) {
         wezel->dane = nastepnik->dane;
         wezel->prawy = usun(wezel->prawy, nastepnik->dane);
     }
-    
-    return wezel; 
+
+    return wezel;
 }
 
 void DrzewoBST::usun(int wartosc) {
@@ -217,14 +226,15 @@ void DrzewoBST::usun(int wartosc) {
     korzen = usun(korzen, wartosc);
 
     if (stary_korzen == nullptr) {
-         cout << "\nNie znaleziono wartości " << wartosc << " do usunięcia (drzewo puste)." << endl;
-    } else if (korzen == nullptr && stary_korzen != nullptr) {
-         cout << "\nWartość " << wartosc << " usunięta pomyśllnie. Drzewo jest teraz puste." << endl;
-    } else {
-         cout << "\nOperacja usuwania dla " << wartosc << " zakończona." << endl;
+        cout << "\nNie znaleziono wartości " << wartosc << " do usunięcia (drzewo puste)." << endl;
+    }
+    else if (korzen == nullptr && stary_korzen != nullptr) {
+        cout << "\nWartość " << wartosc << " usunięta pomyśllnie. Drzewo jest teraz puste." << endl;
+    }
+    else {
+        cout << "\nOperacja usuwania dla " << wartosc << " zakończona." << endl;
     }
 }
-
 void DrzewoBST::zapiszDoTekstu(Wezel* wezel, fstream& plik) {
     if (wezel != nullptr) {
         plik << wezel->dane << "\n";
@@ -232,11 +242,10 @@ void DrzewoBST::zapiszDoTekstu(Wezel* wezel, fstream& plik) {
         zapiszDoTekstu(wezel->prawy, plik);
     }
 }
-
 void DrzewoBST::zapiszDoTekstu(const string& nazwaPliku) {
     fstream plik;
-    plik.open(nazwaPliku, ios::out); 
-    
+    plik.open(nazwaPliku, ios::out);
+
     if (!plik.is_open()) {
         cout << "Błąd otwarcia pliku do zapisu: " << nazwaPliku << endl;
         return;
@@ -247,10 +256,35 @@ void DrzewoBST::zapiszDoTekstu(const string& nazwaPliku) {
     plik.close();
     cout << "Drzewo zapisane (tekstowo) do pliku: " << nazwaPliku << endl;
 }
+void DrzewoBST::zapiszGraficznie(Wezel* wezel, fstream& plik, int poziom, int odstep) {
+    if (wezel == nullptr) {
+        return;
+    }
+    zapiszGraficznie(wezel->prawy, plik, poziom + 1, odstep);
+    for (int i = 0; i < poziom * odstep; i++) {
+        plik << " ";
+    }
+    plik << wezel->dane << "\n";
+    zapiszGraficznie(wezel->lewy, plik, poziom + 1, odstep);
+}
+void DrzewoBST::zapiszGraficznieDoTekstu(const string& nazwaPliku) {
+    fstream plik;
+    plik.open(nazwaPliku, ios::out);
 
+    if (!plik.is_open()) {
+        cout << "Błąd otwarcia pliku do zapisu graficznego: " << nazwaPliku << endl;
+        return;
+    }
+
+    cout << "Rozpoczynam zapis graficzny do pliku: " << nazwaPliku << "..." << endl;
+    zapiszGraficznie(korzen, plik, 0, 5);
+
+    plik.close();
+    cout << "Drzewo zapisane (graficznie) do pliku: " << nazwaPliku << endl;
+}
 void DrzewoBST::usunWszystko() {
-    usunWszystko(korzen); 
-    korzen = nullptr;     
+    usunWszystko(korzen);
+    korzen = nullptr;
 }
 
 void DrzewoBST::usunWszystko(Wezel* wezel) {
@@ -263,7 +297,7 @@ void DrzewoBST::usunWszystko(Wezel* wezel) {
 
 void MenedzerPlikow::wczytajZTekstu(const string& nazwaPliku, DrzewoBST& drzewo) {
     fstream plik;
-    plik.open(nazwaPliku, ios::in); 
+    plik.open(nazwaPliku, ios::in);
 
     if (!plik.is_open()) {
         cout << "Blad otwarcia pliku do odczytu: " << nazwaPliku << endl;
@@ -274,12 +308,13 @@ void MenedzerPlikow::wczytajZTekstu(const string& nazwaPliku, DrzewoBST& drzewo)
 
     int liczba;
     while (plik >> liczba) {
-        drzewo.dodaj(liczba); 
+        drzewo.dodaj(liczba);
     }
 
     if (plik.eof() && !plik.fail()) {
         cout << "Wczytano liczby z pliku: " << nazwaPliku << endl;
-    } else if (plik.fail()) {
+    }
+    else if (plik.fail()) {
         cout << "Blad formatu danych w pliku." << endl;
     }
 
@@ -290,12 +325,13 @@ void MenedzerPlikow::zapiszWezelBinarnie(fstream& plik, Wezel* wezel) {
     if (wezel == nullptr) {
         bool jestWezel = false;
         plik.write(reinterpret_cast<char*>(&jestWezel), sizeof(bool));
-    } else {
+    }
+    else {
         bool jestWezel = true;
         plik.write(reinterpret_cast<char*>(&jestWezel), sizeof(bool));
-        
+
         plik.write(reinterpret_cast<char*>(&wezel->dane), sizeof(int));
-        
+
         zapiszWezelBinarnie(plik, wezel->lewy);
         zapiszWezelBinarnie(plik, wezel->prawy);
     }
@@ -311,16 +347,16 @@ void MenedzerPlikow::zapiszBinarnie(const string& nazwaPliku, DrzewoBST& drzewo)
     }
 
     cout << "Rozpoczynam zapis binarny do pliku: " << nazwaPliku << "..." << endl;
-    
+
     zapiszWezelBinarnie(plik, drzewo.korzen);
-    
+
     plik.close();
     cout << "Drzewo zapisane binarnie do pliku: " << nazwaPliku << endl;
 }
 
 Wezel* MenedzerPlikow::wczytajWezelBinarnie(fstream& plik) {
     bool jestWezel;
-    
+
     plik.read(reinterpret_cast<char*>(&jestWezel), sizeof(bool));
 
     if (!plik) {
@@ -330,14 +366,15 @@ Wezel* MenedzerPlikow::wczytajWezelBinarnie(fstream& plik) {
     if (jestWezel) {
         int dane;
         plik.read(reinterpret_cast<char*>(&dane), sizeof(int));
-        
+
         Wezel* nowyWezel = new Wezel(dane);
-        
+
         nowyWezel->lewy = wczytajWezelBinarnie(plik);
         nowyWezel->prawy = wczytajWezelBinarnie(plik);
-        
+
         return nowyWezel;
-    } else {
+    }
+    else {
         return nullptr;
     }
 }
@@ -359,11 +396,14 @@ void MenedzerPlikow::wczytajBinarnie(const string& nazwaPliku, DrzewoBST& drzewo
 
     if (plik.peek() == EOF && plik.eof()) {
         cout << "Wczytano (binarnie) drzewo z pliku: " << nazwaPliku << endl;
-    } else if (plik.fail()) {
+    }
+    else if (plik.fail()) {
         cout << "Blad formatu danych w pliku binarnym." << endl;
-    } else if (!plik.eof()) {
+    }
+    else if (!plik.eof()) {
         cout << "Ostrzezenie: Plik binarny nie zostal odczytany do konca." << endl;
-    } else {
+    }
+    else {
         cout << "Wczytano (binarnie) drzewo z pliku: " << nazwaPliku << endl;
     }
 
@@ -376,8 +416,8 @@ void wyswietlMenu() {
     cout << "2. Usun element\n";
     cout << "3. Znajdz sciezke\n";
     cout << "4. Wyswietl drzewo (tryby)\n";
-    cout << "5. Usun cale drzewo\n"; 
-    cout << "6. Zapisz do pliku TXT\n";
+    cout << "5. Usun cale drzewo\n";
+    cout << "6. Zapisz graficznie do pliku TXT\n"; 
     cout << "7. Wczytaj z pliku TXT\n";
     cout << "8. Zapisz binarnie (BIN)\n";
     cout << "9. Wczytaj binarnie (BIN)\n";
@@ -389,7 +429,7 @@ int pobierzLiczbeCalkowita() {
     int liczba;
     while (!(cin >> liczba)) {
         cout << "Blad: Wprowadz poprawna liczbe calkowita: ";
-        cin.clear(); 
+        cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -399,7 +439,7 @@ int pobierzLiczbeCalkowita() {
 int main() {
     DrzewoBST drzewo;
     MenedzerPlikow menedzer;
-    
+
     int wybor;
     int wartosc;
     string nazwaPliku;
@@ -409,72 +449,72 @@ int main() {
         wybor = pobierzLiczbeCalkowita();
 
         switch (wybor) {
-            case 1:
-                cout << "Podaj wartosc do dodania: ";
-                wartosc = pobierzLiczbeCalkowita();
-                drzewo.dodaj(wartosc);
-                cout << "Dodano " << wartosc << " do drzewa." << endl;
-                break;
+        case 1:
+            cout << "Podaj wartosc do dodania: ";
+            wartosc = pobierzLiczbeCalkowita();
+            drzewo.dodaj(wartosc);
+            cout << "Dodano " << wartosc << " do drzewa." << endl;
+            break;
 
-            case 2:
-                cout << "Podaj wartosc do usuniecia: ";
-                wartosc = pobierzLiczbeCalkowita();
-                drzewo.usun(wartosc); 
-                break;
+        case 2:
+            cout << "Podaj wartosc do usuniecia: ";
+            wartosc = pobierzLiczbeCalkowita();
+            drzewo.usun(wartosc);
+            break;
 
-            case 3:
-                cout << "Podaj wartosc do znalezienia sciezki: ";
-                wartosc = pobierzLiczbeCalkowita();
-                drzewo.znajdzSciezke(wartosc);
-                break;
+        case 3:
+            cout << "Podaj wartosc do znalezienia sciezki: ";
+            wartosc = pobierzLiczbeCalkowita();
+            drzewo.znajdzSciezke(wartosc);
+            break;
 
-            case 4:
-                cout << "Wybierz tryb wyswietlania:\n";
-                cout << " 1. Pre-order (Korzen -> Lewy -> Prawy)\n";
-                cout << " 2. In-order (Lewy -> Korzen -> Prawy)\n";
-                cout << " 3. Post-order (Lewy -> Prawy -> Korzen)\n";
-                cout << "Wybierz (1-3): ";
-                wartosc = pobierzLiczbeCalkowita();
-                drzewo.wyswietlGraficznie(wartosc);
-                break;
+        case 4:
+            cout << "Wybierz tryb wyswietlania:\n";
+            cout << " 1. Pre-order (Korzen -> Lewy -> Prawy)\n";
+            cout << " 2. In-order (Lewy -> Korzen -> Prawy)\n";
+            cout << " 3. Post-order (Lewy -> Prawy -> Korzen)\n";
+            cout << "Wybierz (1-3): ";
+            wartosc = pobierzLiczbeCalkowita();
+            drzewo.wyswietlGraficznie(wartosc);
+            break;
 
-            case 5:
-                drzewo.usunWszystko();
-                cout << "Cale drzewo zostalo usuniete." << endl;
-                break;
+        case 5:
+            drzewo.usunWszystko();
+            cout << "Cale drzewo zostalo usuniete." << endl;
+            break;
 
-            case 6:
-                cout << "Podaj nazwe pliku do zapisu (np. drzewo.txt): ";
-                getline(cin, nazwaPliku);
-                drzewo.zapiszDoTekstu(nazwaPliku);
-                break;
+        case 6:
+            cout << "Podaj nazwe pliku do zapisu (np. drzewo.txt): ";
+            getline(cin, nazwaPliku);
+            drzewo.zapiszGraficznieDoTekstu(nazwaPliku);
+            break;
 
-            case 7:
-                cout << "Podaj nazwe pliku do wczytania (np. dane.txt): ";
-                getline(cin, nazwaPliku);
-                menedzer.wczytajZTekstu(nazwaPliku, drzewo);
-                break;
+        case 7:
+            cout << "Podaj nazwe pliku do wczytania (np. dane.txt): ";
+            getline(cin, nazwaPliku);
+            menedzer.wczytajZTekstu(nazwaPliku, drzewo);
+            break;
 
-            case 8:
-                cout << "Podaj nazwe pliku do zapisu binarnego (np. drzewo.bin): ";
-                getline(cin, nazwaPliku);
-                menedzer.zapiszBinarnie(nazwaPliku, drzewo);
-                break;
+        case 8:
+            cout << "Podaj nazwe pliku do zapisu binarnego (np. drzewo.bin): ";
+            getline(cin, nazwaPliku);
+            menedzer.zapiszBinarnie(nazwaPliku, drzewo);
+            break;
 
-            case 9:
-                cout << "Podaj nazwe pliku do wczytania binarnego (np. drzewo.bin): ";
-                getline(cin, nazwaPliku);
-                menedzer.wczytajBinarnie(nazwaPliku, drzewo);
-                break;
+        case 9:
+            cout << "Podaj nazwe pliku do wczytania binarnego (np. drzewo.bin): ";
+            getline(cin, nazwaPliku);
+            menedzer.wczytajBinarnie(nazwaPliku, drzewo);
+            break;
 
-            case 0:
-                cout << "Koniec programu." << endl;
-                return 0;
+        case 0:
+            cout << "Koniec programu." << endl;
+            return 0;
 
-            default:
-                cout << "Niepoprawna opcja, sprobuj ponownie." << endl;
+        default:
+            cout << "Niepoprawna opcja, sprobuj ponownie." << endl;
         }
     }
 
-    return 0; 
+    return 0;
 }
