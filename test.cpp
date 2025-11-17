@@ -295,6 +295,7 @@ void DrzewoBST::usunWszystko(Wezel* wezel) {
     }
 }
 
+// POCZĄTEK POPRAWKI KODU 17.11
 void MenedzerPlikow::wczytajZTekstu(const string& nazwaPliku, DrzewoBST& drzewo) {
     fstream plik;
     plik.open(nazwaPliku, ios::in);
@@ -303,15 +304,17 @@ void MenedzerPlikow::wczytajZTekstu(const string& nazwaPliku, DrzewoBST& drzewo)
         cout << "Blad otwarcia pliku do odczytu: " << nazwaPliku << endl;
         return;
     }
-
+    if (plik.peek() == 0xEF) {
+        plik.ignore(3);
+        cout << "(Info: Wykryto i pominięto BOM UTF-8)" << endl;
+    }
     cout << "Rozpoczynam wczytywanie z pliku: " << nazwaPliku << "..." << endl;
 
     int liczba;
     while (plik >> liczba) {
         drzewo.dodaj(liczba);
     }
-
-    if (plik.eof() && !plik.fail()) {
+    if (plik.eof()) {
         cout << "Wczytano liczby z pliku: " << nazwaPliku << endl;
     }
     else if (plik.fail()) {
@@ -320,7 +323,6 @@ void MenedzerPlikow::wczytajZTekstu(const string& nazwaPliku, DrzewoBST& drzewo)
 
     plik.close();
 }
-
 void MenedzerPlikow::zapiszWezelBinarnie(fstream& plik, Wezel* wezel) {
     if (wezel == nullptr) {
         bool jestWezel = false;
@@ -417,7 +419,7 @@ void wyswietlMenu() {
     cout << "3. Znajdz sciezke\n";
     cout << "4. Wyswietl drzewo (tryby)\n";
     cout << "5. Usun cale drzewo\n";
-    cout << "6. Zapisz graficznie do pliku TXT\n"; 
+    cout << "6. Zapisz graficznie do pliku TXT\n";
     cout << "7. Wczytaj z pliku TXT\n";
     cout << "8. Zapisz binarnie (BIN)\n";
     cout << "9. Wczytaj binarnie (BIN)\n";
