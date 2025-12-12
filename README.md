@@ -132,6 +132,5 @@ Plik `test.cpp` służy do sprawdzania poprawności operacji BST (np. czy wstawi
 ## 👤 Autorzy
 **Janq20**  
 **Zahinisu**
-Repo: https://github.com/Janq20/DrzewoBST
 
 ---
